@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/aws_sdk_sts_caching_provider.iml" filepath="$PROJECT_DIR$/aws_sdk_sts_caching_provider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aws-sdk-sts-caching-provider.iml" filepath="$PROJECT_DIR$/aws-sdk-sts-caching-provider.iml" />
     </modules>
   </component>
 </project>

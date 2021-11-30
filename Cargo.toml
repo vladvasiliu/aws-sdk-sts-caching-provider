@@ -1,5 +1,5 @@
 [package]
-name = "aws_sdk_sts_caching_provider"
+name = "aws-sdk-sts-caching-provider"
 version = "0.1.0"
 edition = "2021"
 
