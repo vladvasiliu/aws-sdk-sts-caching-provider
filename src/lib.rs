@@ -5,6 +5,15 @@ use std::time::{Duration, SystemTime};
 use tokio::sync::RwLock;
 use tracing::debug;
 
+/// A caching CredentialsProvider that retrieves credentials from STS.
+///
+/// STS is queried using environment credentials.
+///
+/// The credentials are retrieved via an `AssumeRole` call. The fields of the struct reflect the
+/// parameters for that call.
+///
+/// The `cache_timeout` field represents how many seconds in the future the temporary token must be
+/// valid before being considered stale.
 #[derive(Debug)]
 pub struct STSCredentialsProvider {
     role_arn: String,
@@ -39,7 +48,7 @@ impl STSCredentialsProvider {
     /// Returns the stored credentials if they are valid
     /// The credentials are valid iff
     /// * they're not None
-    /// * they expire at least `STS_CREDENTIAL_DURATION` seconds in the future
+    /// * they expire at least `cache_timeout` seconds in the future
     async fn stored_credentials(&self) -> Option<Credentials> {
         let lock = self.cred_cache.read().await;
         if let Some(c) = lock.as_ref() {
@@ -53,7 +62,6 @@ impl STSCredentialsProvider {
     }
 
     async fn load_credentials(&self) -> aws_types::credentials::Result {
-        debug!("load_credentials called");
         let sts_config = aws_config::load_from_env().await;
         let sts_client = aws_sdk_sts::client::Client::new(&sts_config);
         sts_client
@@ -81,7 +89,7 @@ impl STSCredentialsProvider {
             })
     }
 
-    /// Returns the credentials from caches or updates the cache if they're expired
+    /// Returns the credentials from cache or updates the cache if they're expired
     async fn get_credentials(&self) -> aws_types::credentials::Result {
         match self.stored_credentials().await {
             Some(creds) => {
